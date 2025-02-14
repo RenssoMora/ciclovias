@@ -1,0 +1,4 @@
+task: contrastive
+contrastive: 
+  model: simclr
+  
