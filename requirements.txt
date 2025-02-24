@@ -1,1 +1,6 @@
 PyYAML
+seaborn
+matlplotlib
+tqdm
+pytorch-lightning>=1.4
+scikit-learn

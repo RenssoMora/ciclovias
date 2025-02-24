@@ -33,3 +33,4 @@ _ReSharper*/
 packages/
 db/
 __pycache__/
+data/

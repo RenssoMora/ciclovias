@@ -1,4 +1,18 @@
-task: contrastive
-contrastive: 
-  model: simclr
+task        : feat_ext
+
+local_pt    :
+  colab     : /content/drive/MyDrive/universidad/proyectos/proyecto_amigos/ciclovias/code
+  local     : .
+
+db_pt       : 
+  colab     : /content/drive/MyDrive/universidad/proyectos/proyecto_amigos/ciclovias/code/db   
+  local     : ./db
+
+feat_ext    : 
+  model       : simclr
+  batch_size  : 4
+  epochs      : 10
+  num_workers : 1   
+  new_folder  : False 
+  im_size     : 160  
   

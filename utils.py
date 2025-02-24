@@ -3,6 +3,7 @@ import os
 import argparse
 import json
 import re
+import yaml
 import random 
 import time
 import numpy as np
@@ -10,13 +11,10 @@ from sys import platform
 
 ################################################################################
 ################################################################################
-def u_whichOS():
-    if platform == "linux" or platform == "linux2":
-        return 'linux'
-    elif platform == "darwin":
-        return 'mac'
-    elif platform == "win32":
-        return 'win'
+def u_detect_environment():
+    in_colab    = 'google.colab' in sys.modules
+    system_os   = "Windows" if os.name == 'nt' else platform.system()
+    return in_colab, system_os
 
 ################################################################################
 ################################################################################
@@ -411,7 +409,6 @@ def u_iterdict(d):
 ################################################################################
 ################################################################################
 ################################################################################
-import yaml
 def u_loadYaml(file_name:str):
   '''   It reads a yml file and Returns a class format of dictionary 
   the good is you can format strings in yml employing fstring
@@ -421,6 +418,16 @@ def u_loadYaml(file_name:str):
     dataMap = yaml.safe_load(f)
     data    = u_dict2class(dataMap)
     return data
+
+################################################################################
+################################################################################
+################################################################################
+def u_saveYaml(file_name:str, data):
+    '''   It saves a class format of dictionary into a yml file 
+    ''' 
+    with open(file_name, 'w') as f:
+        yaml.dump(u_class2dict(data), f)
+    print('Data saved in: ', file_name)
 
 ################################################################################
 ################################################################################
@@ -458,4 +465,36 @@ class _MiClase:
 
 def u_dict2class(d):
     return _MiClase(d)
+
+################################################################################
+################################################################################
+################################################################################
+def u_class2dict(obj):
+    """It converts a class instance into a dictionary recursively
+    """
+    if isinstance(obj, dict):
+        return {k: u_class2dict(v) for k, v in obj.items()}
+    elif hasattr(obj, "__dict__"):  # Si es una instancia de clase
+        return {k: u_class2dict(v) for k, v in obj.__dict__.items()}
+    elif isinstance(obj, list):  # Si es una lista, procesar cada elemento
+        return [u_class2dict(item) for item in obj]
+    else:
+        return obj  # Si es un tipo primitivo, devolver tal cual
+
+################################################################################
+################################################################################
+################################################################################
+def u_getLastFile(directory, base_token, flag=True):
+    ''' get the last file in a directory
+    it starts in 1 and increases until it finds the last file
+    it recieves the base_token and the end_token number is between them
+    '''
+    count = 1 
+    while os.path.exists(os.path.join(directory, f"{base_token}_{count}")):
+        count += 1    
+
+    if count == 1:
+        return f"{base_token}_{count}"
+    
+    return f"{base_token}_{count if flag else count-1}"
     
