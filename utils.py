@@ -13,7 +13,7 @@ from sys import platform
 ################################################################################
 def u_detect_environment():
     in_colab    = 'google.colab' in sys.modules
-    system_os   = "Windows" if os.name == 'nt' else platform.system()
+    system_os   = "Windows" if os.name == 'nt' else 'Unix'
     return in_colab, system_os
 
 ################################################################################

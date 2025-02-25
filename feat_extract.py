@@ -7,12 +7,10 @@ import      torchvision.transforms as transforms
 from        torchvision.models import resnet18
 from        torch.utils.data import DataLoader
 import      numpy as np
-#from        sklearn.cluster import KMeans
 import      matplotlib.pyplot as plt
 import      seaborn as sns
-#import      os
 from        utils               import * 
-#from        sklearn.manifold    import TSNE
+from        sklearn.manifold    import TSNE
 
 if u_detect_environment()[0]:
     from tqdm.notebook import tqdm
@@ -91,26 +89,24 @@ def train_simclr(model, dataloader, optimizer, epochs=10):
 
 def extract_embeddings(model, dataloader):
     model.eval()
-    embeddings = []
-    labels = []
+    embeddings  = []
 
     with torch.no_grad():
         for (x, y) in tqdm(dataloader):
-            x = x.to(device)
+            x           = x.to(device)
             features, _ = model(x)  
             embeddings.append(features.cpu().numpy())
-            labels.extend(y.numpy())
 
     embeddings = np.concatenate(embeddings, axis=0)
-    return embeddings, np.array(labels)
+    return embeddings
 
 
 ################################################################################    
 ################################################################################    
 ################################################################################    
-def Fext_contrastive(confs):
+def fext_contrastive(confs):
 
-    lconfs      = confs.feat_ext
+    lconfs      = confs.train_cons
     db_pt       = confs.db_pt.colab if u_detect_environment()[0] else confs.db_pt.local
     data_pt     = f'{confs.local_pt.colab if u_detect_environment()[0] else confs.local_pt.local}/data'  
 
@@ -164,5 +160,66 @@ def Fext_contrastive(confs):
     u_saveYaml(history_pt, u_class2dict(lconfs))
     print(f"Saving model to {model_pt}")
     torch.save(model.state_dict(), model_pt)
+
+################################################################################
+################################################################################
+################################################################################
+def get_model(name):
+    models = {'simclr': SimCLR
+              }
+    return models[name]
+
+################################################################################
+################################################################################
+################################################################################
+def feat_exctraction(confs):
+    lconfs      = confs.feat_ext
+    db_pt       = confs.db_pt.colab if u_detect_environment()[0] else confs.db_pt.local
+    data_pt     = f'{confs.local_pt.colab if u_detect_environment()[0] else confs.local_pt.local}/data'  
+    history_pt  = f'{data_pt}/{lconfs.model}_{lconfs.version}/history.yml'
+
+    #---------------------------------------------------------------------------
+    # Load 
+    history     = u_loadYaml(history_pt)
+    model       = get_model(lconfs.model)().to(device)
+    model.load_state_dict(torch.load(f'{data_pt}/{lconfs.model}_{lconfs.version}/model.pt'))
+
+    #---------------------------------------------------------------------------
+    # Load data
+    dataset     = torchvision.datasets.ImageFolder( root=db_pt,
+                                                    transform=transforms.Compose([
+                                                        transforms.Resize((history.im_size, history.im_size)),
+                                                        transforms.ToTensor()
+                                                    ]))
+    
+    dataloader  = DataLoader(dataset, batch_size=lconfs.batch_size, shuffle=False, num_workers=lconfs.num_workers)
+
+    #---------------------------------------------------------------------------
+    # Extract embeddings
+    embeddings  = extract_embeddings(model, dataloader)
+
+    #---------------------------------------------------------------------------
+    # Save embeddings
+    embeddings_pt   = f'{data_pt}/{lconfs.model}_{lconfs.version}/embeddings.pt'
+    torch.save(embeddings, embeddings_pt)
+    print(f"Saving embeddings to {embeddings_pt}")
+
+    #---------------------------------------------------------------------------
+    # Visualize embeddings
+    tsne = TSNE(n_components=2, perplexity=30, n_iter=300)
+    embeddings_2d = tsne.fit_transform(embeddings)
+
+    sns.set_style('whitegrid')
+    plt.figure(figsize=(6, 6))
+    sns.scatterplot(x=embeddings_2d[:, 0], y=embeddings_2d[:, 1], palette=sns.color_palette("hsv", 10))
+    plt.title("t-SNE visualization of SimCLR embeddings")
+    plt.show()
+    plt.close()
+
+    #---------------------------------------------------------------------------
+    embeddings2d_pt   = f'{data_pt}/{lconfs.model}_{lconfs.version}/embeddings_2d.pt'
+    torch.save(embeddings_2d, embeddings2d_pt)
+
+################################################################################
 
     

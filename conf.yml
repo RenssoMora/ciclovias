@@ -1,4 +1,4 @@
-task        : feat_ext
+task        : clustering
 
 local_pt    :
   colab     : /content/drive/MyDrive/universidad/proyectos/proyecto_amigos/ciclovias/code
@@ -8,11 +8,25 @@ db_pt       :
   colab     : /content/drive/MyDrive/universidad/proyectos/proyecto_amigos/ciclovias/code/db   
   local     : ./db
 
-feat_ext    : 
-  model       : simclr
-  batch_size  : 4
+
+train_cons    :
+  batch_size  : 128
   epochs      : 10
   num_workers : 1   
   new_folder  : False 
-  im_size     : 160  
+  im_size     : 160
+
+feat_ext      : 
+  model       : simclr
+  version     : 1
+  batch_size  : 128
+  num_workers : 1
+  
+clustering    : 
+  model_ver   : simclr_1
+  visualize   : True
+
+val_clusters  : 
+  model_ver_list   : [simclr_1]
+  
   
