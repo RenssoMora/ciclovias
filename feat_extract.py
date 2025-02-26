@@ -172,8 +172,8 @@ def get_model(name):
 ################################################################################
 ################################################################################
 ################################################################################
-def feat_exctraction(confs):
-    lconfs      = confs.feat_ext
+def feat_extraction(confs):
+    lconfs      = confs.feat_extraction
     db_pt       = confs.db_pt.colab if u_detect_environment()[0] else confs.db_pt.local
     data_pt     = f'{confs.local_pt.colab if u_detect_environment()[0] else confs.local_pt.local}/data'  
     history_pt  = f'{data_pt}/{lconfs.model}_{lconfs.version}/history.yml'
@@ -193,6 +193,15 @@ def feat_exctraction(confs):
                                                     ]))
     
     dataloader  = DataLoader(dataset, batch_size=lconfs.batch_size, shuffle=False, num_workers=lconfs.num_workers)
+
+    #---------------------------------------------------------------------------
+    # Save paths
+    embs_file_name_pt   = f'{data_pt}/{lconfs.model}_{lconfs.version}/embs_file_names.json'   
+    image_paths         = [s[0] for s in dataset.samples]
+    u_replaceStrList(image_paths, db_pt, '')
+    u_replaceStrList(image_paths, '\\', '/')    
+    u_save2json(embs_file_name_pt, image_paths)
+    print(f"Saving image paths to {embs_file_name_pt}")
 
     #---------------------------------------------------------------------------
     # Extract embeddings

@@ -1,4 +1,4 @@
-task        : clustering
+task        : val_clusters
 
 local_pt    :
   colab     : /content/drive/MyDrive/universidad/proyectos/proyecto_amigos/ciclovias/code
@@ -9,14 +9,14 @@ db_pt       :
   local     : ./db
 
 
-train_cons    :
+train_contrastive  :
   batch_size  : 128
   epochs      : 10
   num_workers : 1   
   new_folder  : False 
   im_size     : 160
 
-feat_ext      : 
+feat_extraction    : 
   model       : simclr
   version     : 1
   batch_size  : 128
@@ -27,6 +27,6 @@ clustering    :
   visualize   : True
 
 val_clusters  : 
-  model_ver_list   : [simclr_1]
+  model_ver   :  simclr_1
   
   

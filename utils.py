@@ -150,7 +150,7 @@ def u_saveArrayTuple2File(file_name, data):
 '''
 Save dict into file, recommendably [.json]
 '''
-def u_saveDict2File(file_name, data):
+def u_save2json(file_name, data):
     print ('Saving Dict data in: ', file_name)
     with open(file_name, 'w') as outfile:  
         json.dump(data, outfile)
@@ -312,10 +312,10 @@ def u_init_list_of_objects(size):
 ################################################################################
 ################################################################################
 def u_replaceStrList(str_list, token1, token2):
-    ''' replace string in a list of strings'''
+    ''' replace string in a list of strings
+        inplace!'''
     for i in range(len(str_list)):
-        str_list = str_list.replace(token1, token2)
-    return str_list
+        str_list[i] = str_list[i].replace(token1, token2)
 
 ################################################################################
 ################################################################################
