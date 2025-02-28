@@ -157,7 +157,7 @@ def fext_contrastive(confs):
     model_pt     = f'{version_pt}/model.pt'
     history_pt   = f'{version_pt}/history.yml'
 
-    u_saveYaml(history_pt, u_class2dict(lconfs))
+    u_save2Yaml(history_pt, u_class2dict(lconfs))
     print(f"Saving model to {model_pt}")
     torch.save(model.state_dict(), model_pt)
 

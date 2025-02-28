@@ -22,11 +22,16 @@ feat_extraction    :
   batch_size  : 128
   num_workers : 1
   
-clustering    : 
-  model_ver   : simclr_1
-  visualize   : True
+clustering      : 
+  model_ver     : simclr_1
+  visualize     : True
+  n_clusters    : 10
+  method        : spectral
 
 val_clusters  : 
   model_ver   :  simclr_1
+  n_images    :  10
+  
+
   
   

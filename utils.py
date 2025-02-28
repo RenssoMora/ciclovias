@@ -422,7 +422,7 @@ def u_loadYaml(file_name:str):
 ################################################################################
 ################################################################################
 ################################################################################
-def u_saveYaml(file_name:str, data):
+def u_save2Yaml(file_name:str, data):
     '''   It saves a class format of dictionary into a yml file 
     ''' 
     with open(file_name, 'w') as f:
