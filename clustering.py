@@ -23,7 +23,20 @@ def clustering(confs):
     #---------------------------------------------------------------------------    
     # Cluster
     if lconfs.method == 'kmeans':
-        clusters    = sk.cluster.KMeans(n_clusters=lconfs.n_clusters).fit_predict(embs)
+        wcss = []
+        range_ = range(2, 30, 3)
+        for i in tqdm(range_):
+            wcss.append(sk.cluster.KMeans(n_clusters=i, n_init = 10).fit(embs).inertia_)
+
+        plt.plot(range_, wcss)
+        plt.title('Elbow Method')   
+        plt.xlabel('Number of clusters')
+        plt.grid(alpha=0.7)
+        plt.ylabel('WCSS')
+        plt.savefig(f'{data_pt}/{lconfs.model_ver}/elbow_method.png')
+        plt.show()
+
+        #clusters    = sk.cluster.KMeans(n_clusters=lconfs.n_clusters).fit(embs)
     elif lconfs.method == 'spectral':
         clusters    = sk.cluster.SpectralClustering(n_clusters=lconfs.n_clusters, 
                                                     n_neighbors=40,
@@ -94,11 +107,11 @@ def val_clusters(confs):
     embs_2d     = torch.load(f'{data_pt}/{lconfs.model_ver}/embeddings_2d.pt', weights_only=False)
     embs        = torch.load(f'{data_pt}/{lconfs.model_ver}/embeddings.pt', weights_only=False) 
     history     = u_loadYaml(f'{data_pt}/{lconfs.model_ver}/clustering_history.yml')
-    #visualize_clusters(embs_2d, labels, f'{data_pt}/{lconfs.model_ver}', False, file_names)
+    visualize_clusters(embs_2d, labels, f'{data_pt}/{lconfs.model_ver}', True, file_names)
     #---------------------------------------------------------------------------
     # Find mean image
-    find_mean_image(embs, labels, file_names, db_pt, history, lconfs.n_images,
-                    f'{data_pt}/{lconfs.model_ver}/imgs')
+    # find_mean_image(embs, labels, file_names, db_pt, history, lconfs.n_images,
+    #                f'{data_pt}/{lconfs.model_ver}/imgs')
 
 ################################################################################
 ################################################################################

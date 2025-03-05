@@ -4,7 +4,7 @@ import      torch.nn as nn
 import      torch.optim as optim
 import      torchvision
 import      torchvision.transforms as transforms
-from        torchvision.models import resnet18
+from        torchvision.models import resnet18, resnet50
 from        torch.utils.data import DataLoader
 import      numpy as np
 import      matplotlib.pyplot as plt
@@ -21,13 +21,26 @@ else:
 device      = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class SimCLR(nn.Module):
-    def __init__(self, base_model=resnet18, feature_dim=128):
+    def __init__(self, base_model='resnet18', feature_dim=128):
         super(SimCLR, self).__init__()
-        self.backbone = base_model(pretrained=True)
-        self.backbone.fc = nn.Identity() 
-        self.projection = nn.Sequential(
-            nn.Linear(512, 512), nn.ReLU(), nn.Linear(512, feature_dim)
-        )
+        if base_model == 'resnet18':
+            base_model = resnet18
+            self.backbone = base_model(pretrained=True)
+            self.backbone.fc = nn.Identity() 
+            self.projection = nn.Sequential(
+                nn.Linear(512, 512), nn.ReLU(), nn.Linear(512, feature_dim)
+            )        
+        
+        
+        elif base_model == 'resnet50':
+            base_model = resnet50   
+            self.backbone = base_model(pretrained=True)
+            self.backbone.fc = nn.Identity() 
+            self.projection = nn.Sequential(
+                nn.Linear(2048, 900), nn.ReLU(), nn.Linear(900, feature_dim)
+            )
+
+        
 
     def forward(self, x):
         features      = self.backbone(x)
@@ -106,7 +119,7 @@ def extract_embeddings(model, dataloader):
 ################################################################################    
 def fext_contrastive(confs):
 
-    lconfs      = confs.train_cons
+    lconfs      = confs.train_contrastive
     db_pt       = confs.db_pt.colab if u_detect_environment()[0] else confs.db_pt.local
     data_pt     = f'{confs.local_pt.colab if u_detect_environment()[0] else confs.local_pt.local}/data'  
 
@@ -131,7 +144,7 @@ def fext_contrastive(confs):
     
     dataloader  = DataLoader(dataset, batch_size=lconfs.batch_size, shuffle=True, num_workers=lconfs.num_workers)
 
-    model       = SimCLR().to(device)
+    model       = SimCLR(lconfs.model).to(device)
 
     optimizer   = optim.AdamW(model.parameters(), lr=3e-4)
 
